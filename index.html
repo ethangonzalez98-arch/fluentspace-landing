@@ -1,0 +1,632 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<!-- ============================================================
+  Still — landing page (single self-contained file)
+  Theme: "ink & rain" — the dark, greenish look of the app itself.
+  Placeholders are marked with  ◆ PLACEHOLDER  comments:
+  swap the files/links in and the page is production-ready.
+  ============================================================ -->
+
+<title>Still — Your phone stays locked until you've learned today's Chinese</title>
+<meta name="description" content="Still blocks your most distracting apps until you finish a two-minute Mandarin lesson. Reclaim your attention — and learn a language while you do it.">
+
+<!-- Social preview image (og-image.jpg, 1200×630 — generated from the hero) -->
+<meta property="og:type" content="website">
+<meta property="og:title" content="Still — study Chinese to unlock your phone">
+<meta property="og:description" content="Still blocks your most distracting apps until you finish a two-minute Mandarin lesson. Reclaim your attention — and learn a language while you do it.">
+<meta property="og:image" content="og-image.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Still — study Chinese to unlock your phone">
+<meta name="twitter:description" content="Still blocks your most distracting apps until you finish a two-minute Mandarin lesson. Reclaim your attention — and learn a language while you do it.">
+<meta name="twitter:image" content="og-image.jpg">
+
+<!-- Favicon: the app's icon-still artwork, downscaled -->
+<link rel="icon" type="image/png" href="favicon.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="theme-color" content="#0E1113">
+
+<!-- The one allowed external dependency: a serif for headings (system fallback: Georgia). -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
+
+<script>
+  // Placeholder helpers — defined in <head> so inline onerror handlers can
+  // never fire before they exist.
+  // If the official App Store badge artwork isn't dropped in yet, swap the
+  // broken <img> for a neutral text link so the page never looks broken.
+  function badgeFallback(img) {
+    var a = img.closest('a');
+    if (!a) return;
+    a.classList.remove('badge');
+    a.classList.add('badge-fallback');
+    a.innerHTML = '<span><small>Download on the</small>App Store</span>';
+  }
+  // Screenshot frames show a dashed placeholder until screen-N.png exists.
+  function markMissing(img) {
+    var f = img.closest('.shot-frame');
+    if (f) f.classList.add('missing');
+    img.remove();
+  }
+</script>
+
+<style>
+  /* ---- ink & rain tokens (mirror src/theme from the app, Still era) ---- */
+  :root {
+    --bg:        #0E1113;  /* near-black */
+    --surface:   #161A1D;  /* card */
+    --surface-2: #1B2125;  /* elevated card */
+    --border:    #293036;  /* hairline */
+    --text:      #ECEDE6;  /* rice-paper white */
+    --dim:       #97A39C;  /* dim text (AA on --bg) */
+    --jade:      #7FA88C;  /* primary accent */
+    --jade-hi:   #9DBFA7;  /* jade, hover */
+    --jade-soft: rgba(127,168,140,.13);
+    --verm:      #B5483D;  /* vermilion — sparing emphasis only */
+    --serif: "Noto Serif", Georgia, "Times New Roman", serif;
+    --sans:  -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    --max: 1120px;
+  }
+
+  * { box-sizing: border-box; margin: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--sans);
+    font-size: 17px;
+    line-height: 1.65;
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+  }
+
+  ::selection { background: rgba(127,168,140,.35); }
+
+  a { color: var(--jade); text-decoration-color: rgba(127,168,140,.45); text-underline-offset: 3px; }
+  a:hover { color: var(--jade-hi); }
+
+  a:focus-visible, button:focus-visible {
+    outline: 2px solid var(--jade);
+    outline-offset: 3px;
+    border-radius: 6px;
+  }
+
+  .skip {
+    position: absolute; left: 16px; top: -60px;
+    background: var(--surface-2); color: var(--text);
+    padding: 10px 16px; border-radius: 8px; z-index: 50;
+    transition: top .2s ease;
+  }
+  .skip:focus { top: 12px; }
+
+  .wrap { max-width: var(--max); margin: 0 auto; padding: 0 24px; }
+
+  /* ================= ambient rain & mist (pure CSS, decorative) ============ */
+  .atmos { position: fixed; inset: 0; z-index: -2; pointer-events: none; overflow: hidden; }
+  /* soft jade mist pooled at the top of the page */
+  .atmos::before {
+    content: ""; position: absolute; inset: 0;
+    background:
+      radial-gradient(60% 42% at 50% -6%, rgba(127,168,140,.10), transparent 70%),
+      radial-gradient(45% 35% at 85% 20%, rgba(127,168,140,.05), transparent 70%),
+      radial-gradient(120% 90% at 50% 115%, rgba(9,11,12,.9), transparent 60%);
+  }
+  /* two identical streak fields, offset by half a cycle → seamless fall */
+  .rain-layer {
+    position: absolute; left: 0; right: 0; top: 0; height: 100%;
+    width: 1px; /* streaks are box-shadows of this box */
+    animation: rainfall 11s linear infinite;
+  }
+  .rain-layer.two { animation-delay: -5.5s; }
+  .rain-layer::before {
+    content: ""; position: absolute; width: 1px; height: 26px; border-radius: 1px;
+    background: transparent;
+    box-shadow:
+       4vw  6vh 0 0 rgba(236,237,230,.07), 11vw 41vh 0 0 rgba(236,237,230,.05),
+      17vw 78vh 0 0 rgba(236,237,230,.08), 23vw 22vh 0 0 rgba(236,237,230,.05),
+      29vw 57vh 0 0 rgba(236,237,230,.07), 35vw 12vh 0 0 rgba(236,237,230,.06),
+      41vw 88vh 0 0 rgba(236,237,230,.05), 47vw 36vh 0 0 rgba(236,237,230,.08),
+      53vw 66vh 0 0 rgba(236,237,230,.05), 59vw 17vh 0 0 rgba(236,237,230,.07),
+      65vw 49vh 0 0 rgba(236,237,230,.05), 71vw 82vh 0 0 rgba(236,237,230,.07),
+      77vw 28vh 0 0 rgba(236,237,230,.06), 83vw 61vh 0 0 rgba(236,237,230,.05),
+      89vw  9vh 0 0 rgba(236,237,230,.08), 95vw 44vh 0 0 rgba(236,237,230,.06),
+       8vw 92vh 0 0 rgba(236,237,230,.05), 20vw 48vh 0 0 rgba(236,237,230,.06),
+      32vw 84vh 0 0 rgba(236,237,230,.05), 44vw 14vh 0 0 rgba(236,237,230,.07),
+      56vw 39vh 0 0 rgba(236,237,230,.05), 68vw 71vh 0 0 rgba(236,237,230,.06),
+      80vw 95vh 0 0 rgba(236,237,230,.05), 92vw 25vh 0 0 rgba(236,237,230,.07),
+      14vw 68vh 0 0 rgba(236,237,230,.06), 62vw  5vh 0 0 rgba(236,237,230,.05);
+  }
+  @keyframes rainfall {
+    from { transform: translateY(-100%); }
+    to   { transform: translateY(100%); }
+  }
+
+  /* ============================ header ==================================== */
+  header.site {
+    position: sticky; top: 0; z-index: 20;
+    backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
+    background: rgba(14,17,19,.72);
+    border-bottom: 1px solid var(--border);
+  }
+  header.site .wrap {
+    display: flex; align-items: center; justify-content: space-between;
+    padding-top: 14px; padding-bottom: 14px;
+  }
+  .brand { display: flex; align-items: center; gap: 12px; text-decoration: none; color: var(--text); }
+  .brand .word { font-family: var(--serif); font-size: 21px; font-weight: 600; letter-spacing: .04em; }
+  .seal {
+    width: 34px; height: 34px; border-radius: 8px; flex: none;
+    background: var(--verm);
+    display: grid; place-items: center;
+    color: #F4E9E2; font-family: var(--serif); font-size: 20px; font-weight: 700;
+    box-shadow: 0 2px 14px rgba(181,72,61,.35);
+  }
+  .nav-cta {
+    font-size: 14px; font-weight: 600; letter-spacing: .02em;
+    color: var(--text); text-decoration: none;
+    border: 1px solid var(--border); border-radius: 999px;
+    padding: 8px 18px; background: var(--surface);
+    transition: border-color .2s ease, background .2s ease;
+  }
+  .nav-cta:hover { border-color: var(--jade); background: var(--jade-soft); color: var(--text); }
+
+  /* ============================= hero ===================================== */
+  .hero { position: relative; padding: 96px 0 88px; overflow: hidden; }
+  /* giant 静 watermark behind the hero copy */
+  .hero::after {
+    content: "静"; position: absolute; z-index: -1;
+    right: -4%; top: 50%; transform: translateY(-50%);
+    font-family: var(--serif); font-weight: 700;
+    font-size: min(58vw, 560px); line-height: 1;
+    color: rgba(236,237,230,.028);
+    pointer-events: none; user-select: none;
+  }
+  .hero .wrap {
+    display: grid; grid-template-columns: 1.15fr .85fr;
+    gap: 64px; align-items: center;
+  }
+  .eyebrow {
+    display: inline-flex; align-items: center; gap: 10px;
+    font-size: 13px; font-weight: 600; letter-spacing: .22em; text-transform: uppercase;
+    color: var(--jade); margin-bottom: 26px;
+  }
+  .eyebrow::before { content: ""; width: 26px; height: 1px; background: var(--jade); }
+  .eyebrow .zh { letter-spacing: .35em; color: var(--dim); }
+
+  h1 {
+    font-family: var(--serif); font-weight: 600;
+    font-size: clamp(2.35rem, 5.2vw, 3.9rem);
+    line-height: 1.14; letter-spacing: -.01em;
+    max-width: 14ch;
+  }
+  h1 em { font-style: normal; color: var(--jade); }
+
+  .sub {
+    margin-top: 24px; max-width: 46ch;
+    font-size: clamp(1.02rem, 1.4vw, 1.15rem); color: var(--dim);
+  }
+  .sub strong { color: var(--text); font-weight: 600; }
+
+  .hero-cta { margin-top: 38px; display: flex; align-items: center; gap: 20px; flex-wrap: wrap; }
+  .badge { display: inline-block; line-height: 0; }
+  .badge img { height: 52px; width: auto; display: block; }
+  /* shown only while appstore-badge.svg is missing (JS swaps it in) */
+  .badge-fallback {
+    display: inline-flex; align-items: center; gap: 10px;
+    border: 1px solid var(--border); border-radius: 10px;
+    background: #000; color: #fff; text-decoration: none;
+    padding: 10px 20px; font-size: 15px; font-weight: 600; line-height: 1.2;
+  }
+  .badge-fallback small { display: block; font-size: 10.5px; font-weight: 400; color: #cfcfcf; }
+  .badge-fallback:hover { border-color: var(--jade); }
+  .hero-note { font-size: 13.5px; color: var(--dim); }
+
+  /* ---- phone mockup ---- */
+  .phone {
+    justify-self: center;
+    width: min(300px, 78vw); aspect-ratio: 9 / 19.2;
+    border-radius: 44px; padding: 10px;
+    background: linear-gradient(160deg, #20262a, #101416 60%);
+    border: 1px solid #31393f;
+    box-shadow: 0 40px 90px rgba(0,0,0,.55), 0 0 0 1px rgba(0,0,0,.6),
+                0 0 90px rgba(127,168,140,.07);
+    transform: rotate(2.5deg);
+  }
+  .phone .screen {
+    position: relative; width: 100%; height: 100%; overflow: hidden;
+    border-radius: 36px; background: var(--surface);
+  }
+  .phone .notch {
+    position: absolute; top: 10px; left: 50%; transform: translateX(-50%);
+    width: 34%; height: 22px; border-radius: 12px; background: #05070a; z-index: 3;
+  }
+  /* ◆ PLACEHOLDER: real screenshot drops in as hero-screenshot.png and
+       automatically covers the CSS stand-in below (no edits needed). */
+  .phone img.shot {
+    position: absolute; inset: 0; width: 100%; height: 100%;
+    object-fit: cover; z-index: 2;
+  }
+  /* CSS stand-in: a miniature of the daily flashcard, drawn like the app */
+  .mini {
+    position: absolute; inset: 0; z-index: 1;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: 8px; text-align: center; padding: 24px;
+    background:
+      radial-gradient(80% 40% at 50% 0%, rgba(127,168,140,.08), transparent 70%),
+      var(--surface);
+  }
+  .mini .day { font-size: 10px; letter-spacing: .3em; color: var(--dim); text-transform: uppercase; }
+  .mini .hanzi { font-family: var(--serif); font-size: 84px; font-weight: 700; line-height: 1.1; }
+  .mini .pinyin { font-size: 17px; color: var(--jade); font-weight: 600; }
+  .mini .gloss { font-size: 14px; color: var(--dim); }
+  .mini .rate { display: flex; gap: 8px; margin-top: 18px; }
+  .mini .rate span {
+    font-size: 10.5px; font-weight: 600; padding: 6px 13px; border-radius: 999px;
+    border: 1px solid var(--border); color: var(--dim); background: var(--bg);
+  }
+  .mini .rate span.know { color: var(--jade); border-color: rgba(127,168,140,.5); }
+
+  /* ========================== section chrome ============================== */
+  section.block { padding: 96px 0; border-top: 1px solid var(--border); }
+  section[id] { scroll-margin-top: 84px; } /* clear the sticky header on anchor jumps */
+  .sec-head { max-width: 640px; margin-bottom: 56px; }
+  .sec-head h2 {
+    font-family: var(--serif); font-weight: 600;
+    font-size: clamp(1.75rem, 3.4vw, 2.5rem); line-height: 1.2; letter-spacing: -.01em;
+  }
+  .sec-head p { margin-top: 14px; color: var(--dim); }
+
+  /* ============================ how it works ============================== */
+  .steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 28px; }
+  .step { border-top: 1px solid var(--border); padding-top: 26px; position: relative; }
+  .step .num {
+    font-family: var(--serif); font-size: 15px; font-weight: 700; color: var(--jade);
+    display: inline-grid; place-items: center;
+    width: 40px; height: 40px; border: 1px solid rgba(127,168,140,.4); border-radius: 50%;
+    margin-bottom: 18px; background: var(--jade-soft);
+  }
+  .step h3 { font-family: var(--serif); font-size: 21px; font-weight: 600; margin-bottom: 8px; }
+  .step p { color: var(--dim); font-size: 15.5px; }
+
+  /* ============================ why different ============================= */
+  .cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 28px; }
+  .card {
+    background: var(--surface); border: 1px solid var(--border); border-radius: 20px;
+    padding: 30px 28px;
+    transition: transform .25s ease, border-color .25s ease, background .25s ease;
+  }
+  .card:hover { transform: translateY(-4px); border-color: rgba(127,168,140,.45); background: var(--surface-2); }
+  .card .icon {
+    width: 46px; height: 46px; border-radius: 12px; margin-bottom: 20px;
+    display: grid; place-items: center;
+    background: var(--jade-soft); border: 1px solid rgba(127,168,140,.28);
+  }
+  .card .icon svg { stroke: var(--jade); }
+  .card h3 { font-family: var(--serif); font-size: 20px; font-weight: 600; margin-bottom: 8px; }
+  .card p { color: var(--dim); font-size: 15.5px; }
+  .card p em { color: var(--text); font-style: normal; font-weight: 600; }
+
+  /* ============================= screenshots ============================== */
+  .shots { display: grid; grid-template-columns: repeat(4, 1fr); gap: 22px; }
+  .shot-frame {
+    position: relative; aspect-ratio: 9 / 19.2; border-radius: 26px; overflow: hidden;
+    background: var(--surface); border: 1px solid var(--border);
+    box-shadow: 0 18px 44px rgba(0,0,0,.4);
+  }
+  .shot-frame img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+  /* placeholder look until screen-N.png is dropped in (JS adds .missing) */
+  .shot-frame.missing { border-style: dashed; }
+  .shot-frame.missing::after {
+    content: attr(data-name) "\Aplaceholder — drop in the file";
+    white-space: pre; position: absolute; inset: 0;
+    display: grid; place-items: center; text-align: center;
+    color: var(--dim); font-size: 12.5px; line-height: 1.8; padding: 12px;
+  }
+
+  /* ============================= social proof ============================= */
+  .proof-inner {
+    border: 1px dashed var(--border); border-radius: 20px;
+    padding: 56px 32px; text-align: center; background: rgba(22,26,29,.5);
+  }
+  .stars { display: inline-flex; gap: 6px; margin-bottom: 16px; }
+  .stars svg { stroke: var(--jade); fill: none; }
+  .proof-inner p { color: var(--dim); font-size: 15.5px; max-width: 46ch; margin: 0 auto; }
+
+  /* ============================== final CTA =============================== */
+  .final { text-align: center; padding: 110px 0; position: relative; overflow: hidden; }
+  .final::after {
+    content: "静"; position: absolute; left: 50%; top: 50%;
+    transform: translate(-50%,-50%);
+    font-family: var(--serif); font-weight: 700; font-size: min(70vw, 460px);
+    color: rgba(236,237,230,.022); z-index: -1; pointer-events: none; user-select: none;
+  }
+  .final h2 {
+    font-family: var(--serif); font-weight: 600;
+    font-size: clamp(1.9rem, 4vw, 3rem); line-height: 1.18; max-width: 20ch; margin: 0 auto;
+  }
+  .final h2 em { font-style: normal; color: var(--jade); }
+  .final .badge, .final .badge-fallback { margin-top: 34px; }
+  .final .hero-note { margin-top: 16px; }
+
+  /* ================================ footer ================================ */
+  footer.site { border-top: 1px solid var(--border); padding: 44px 0 56px; }
+  footer.site .wrap {
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 24px; flex-wrap: wrap;
+  }
+  footer .left { display: flex; align-items: center; gap: 12px; }
+  footer .seal { width: 28px; height: 28px; font-size: 16px; border-radius: 7px; }
+  footer .copy { color: var(--dim); font-size: 14px; }
+  footer .links { display: flex; align-items: center; gap: 26px; font-size: 14.5px; flex-wrap: wrap; }
+
+  /* ============================ scroll reveal ============================= */
+  .reveal { opacity: 0; transform: translateY(26px); transition: opacity .7s ease, transform .7s ease; }
+  .reveal.in { opacity: 1; transform: none; }
+  .reveal.d1 { transition-delay: .08s; } .reveal.d2 { transition-delay: .16s; }
+  .reveal.d3 { transition-delay: .24s; } .reveal.d4 { transition-delay: .32s; }
+
+  /* ============================= responsive =============================== */
+  @media (max-width: 900px) {
+    .hero { padding: 64px 0 72px; }
+    .hero .wrap { grid-template-columns: 1fr; gap: 56px; }
+    h1 { max-width: 18ch; }
+    .steps, .cards { grid-template-columns: 1fr; gap: 36px; }
+    .shots { grid-template-columns: repeat(2, 1fr); }
+    section.block { padding: 72px 0; }
+  }
+  @media (max-width: 480px) {
+    .shots { grid-template-columns: 1fr 1fr; gap: 14px; }
+    .hero-cta { gap: 14px; }
+  }
+
+  /* ========================= reduced motion =============================== */
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    .rain-layer { animation: none; display: none; }
+    .reveal { opacity: 1; transform: none; transition: none; }
+    .card, .card:hover { transform: none; transition: none; }
+    .phone { transform: none; }
+    .skip { transition: none; }
+  }
+</style>
+</head>
+<body>
+
+<a class="skip" href="#main">Skip to content</a>
+
+<!-- ambient rain + mist (decorative) -->
+<div class="atmos" aria-hidden="true">
+  <div class="rain-layer"></div>
+  <div class="rain-layer two"></div>
+</div>
+
+<header class="site">
+  <div class="wrap">
+    <a class="brand" href="#top" aria-label="Still — back to top">
+      <span class="seal" aria-hidden="true">静</span>
+      <span class="word">Still</span>
+    </a>
+    <a class="nav-cta" href="https://apps.apple.com/us/app/still-chinese-to-unlock/id6787534253">Download</a>
+  </div>
+</header>
+
+<main id="main">
+
+  <!-- ================================ HERO ================================ -->
+  <section class="hero" id="top">
+    <div class="wrap">
+      <div>
+        <p class="eyebrow"><span class="zh" lang="zh">静</span> Study to unlock</p>
+
+        <!-- ◆ Headline variants (swap if you like):
+             A) "Your phone stays locked until you've learned today's Chinese."   ← current
+             B) "Reclaim your brain. Learn Chinese doing it."
+             C) "The toll between you and TikTok is two minutes of Chinese." -->
+        <h1>Your phone stays locked until you've learned <em>today's Chinese.</em></h1>
+
+        <p class="sub">Still blocks your most distracting apps until you finish a
+        <strong>two-minute Mandarin lesson</strong>. Reclaim your attention — and
+        learn a language while you do it.</p>
+
+        <div class="hero-cta">
+          <!-- App Store badge (Apple's official appstore-badge.svg) -->
+          <a class="badge" href="https://apps.apple.com/us/app/still-chinese-to-unlock/id6787534253">
+            <img src="appstore-badge.svg" alt="Download on the App Store" height="52"
+                 onerror="badgeFallback(this)">
+          </a>
+          <span class="hero-note">Made for iPhone</span>
+        </div>
+      </div>
+
+      <div class="phone reveal in" role="img" aria-label="Preview of the Still app: a daily Chinese flashcard">
+        <div class="screen">
+          <div class="notch"></div>
+          <!-- Real screenshot (the flashcard back). If hero-screenshot.jpg is
+               ever missing, the CSS stand-in behind it shows instead. -->
+          <img class="shot" src="hero-screenshot.jpg" alt="Still app — daily Chinese flashcard session"
+               onerror="this.remove()">
+          <!-- CSS stand-in shown until hero-screenshot.png exists -->
+          <div class="mini" aria-hidden="true">
+            <span class="day">Today · 今日</span>
+            <span class="hanzi" lang="zh">水</span>
+            <span class="pinyin">shuǐ</span>
+            <span class="gloss">water</span>
+            <div class="rate"><span>again</span><span class="know">know it</span><span>easy</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================= HOW IT WORKS =========================== -->
+  <section class="block" id="how">
+    <div class="wrap">
+      <div class="sec-head reveal">
+        <p class="eyebrow"><span class="zh" lang="zh">三步</span> How it works</p>
+        <h2>Two minutes of Chinese stands between you and the scroll.</h2>
+      </div>
+      <div class="steps">
+        <div class="step reveal d1">
+          <span class="num" aria-hidden="true">1</span>
+          <h3>Choose what to block.</h3>
+          <p>Pick the apps that eat your time — Instagram, TikTok, whatever pulls you in.</p>
+        </div>
+        <div class="step reveal d2">
+          <span class="num" aria-hidden="true">2</span>
+          <h3>Do your daily words.</h3>
+          <p>A quick HSK flashcard session: swipe, learn, build a streak.</p>
+        </div>
+        <div class="step reveal d3">
+          <span class="num" aria-hidden="true">3</span>
+          <h3>Everything unlocks.</h3>
+          <p>Finish and your phone is yours again — until tomorrow.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================ WHY IT'S DIFFERENT ====================== -->
+  <section class="block" id="why">
+    <div class="wrap">
+      <div class="sec-head reveal">
+        <p class="eyebrow"><span class="zh" lang="zh">为何不同</span> Why it's different</p>
+        <h2>Screen-time apps fail because they only take. Still gives back.</h2>
+      </div>
+      <div class="cards">
+        <div class="card reveal d1">
+          <div class="icon" aria-hidden="true">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round">
+              <circle cx="9" cy="12" r="5.5"/><circle cx="15" cy="12" r="5.5"/>
+            </svg>
+          </div>
+          <h3>Two problems, one habit.</h3>
+          <p>Cut your screen time and learn Mandarin with the same two minutes a day.</p>
+        </div>
+        <div class="card reveal d2">
+          <div class="icon" aria-hidden="true">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M7 4 3.5 7.5 7 11"/><path d="M3.5 7.5h13"/><path d="m17 13 3.5 3.5L17 20"/><path d="M20.5 16.5h-13"/>
+            </svg>
+          </div>
+          <h3>Flip the deal.</h3>
+          <p>Your apps were engineered to keep you scrolling. Still makes them earn their way back — they don't open until you've done something for <em>you</em>.</p>
+        </div>
+        <div class="card reveal d3">
+          <div class="icon" aria-hidden="true">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 3c1 3-2.5 4.5-2.5 7.5a4.5 4.5 0 0 0 9 0C18.5 7 13.5 6 12 3Z"/><path d="M12 21a6 6 0 0 1-6-6c0-1.5.5-2.7 1.3-3.8"/>
+            </svg>
+          </div>
+          <h3>Actually stick with it.</h3>
+          <p>Streaks, XP, and ranks turn studying into a game. 10,969 words, HSK 1 through 7.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================== SCREENSHOTS =========================== -->
+  <section class="block" id="screenshots">
+    <div class="wrap">
+      <div class="sec-head reveal">
+        <p class="eyebrow"><span class="zh" lang="zh">看一看</span> Inside the app</p>
+        <h2>Calm on the surface. Stubborn underneath.</h2>
+      </div>
+      <!-- Real App Store screenshots (web-optimized JPEGs; source PNGs live in
+           "assets/app store photos/ready/"). A frame falls back to a dashed
+           placeholder if its file is ever missing. -->
+      <div class="shots">
+        <div class="shot-frame reveal d1" data-name="screen-1.jpg">
+          <img src="screen-1.jpg" alt="Still app screenshot — a gilded flashcard worth triple XP mid-session" onerror="markMissing(this)">
+        </div>
+        <div class="shot-frame reveal d2" data-name="screen-2.jpg">
+          <img src="screen-2.jpg" alt="Still app screenshot — session complete: XP earned, rank up, apps unlocked" onerror="markMissing(this)">
+        </div>
+        <div class="shot-frame reveal d3" data-name="screen-3.jpg">
+          <img src="screen-3.jpg" alt="Still app screenshot — HSK vocabulary library with mastered words" onerror="markMissing(this)">
+        </div>
+        <div class="shot-frame reveal d4" data-name="screen-4.jpg">
+          <img src="screen-4.jpg" alt="Still app screenshot — locked home screen: clear 12 cards to open your apps" onerror="markMissing(this)">
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================== SOCIAL PROOF ========================== -->
+  <section class="block" id="reviews">
+    <div class="wrap">
+      <!-- ◆ PLACEHOLDER: social proof — replace this block with REAL App Store
+           reviews / ratings once they exist. Do not invent testimonials. -->
+      <div class="proof-inner reveal">
+        <div class="stars" aria-hidden="true">
+          <svg width="22" height="22" viewBox="0 0 24 24" stroke-width="1.5" stroke-linejoin="round"><path d="m12 3 2.7 5.6 6.1.8-4.5 4.3 1.1 6.1L12 16.9l-5.4 2.9 1.1-6.1L3.2 9.4l6.1-.8L12 3Z"/></svg>
+          <svg width="22" height="22" viewBox="0 0 24 24" stroke-width="1.5" stroke-linejoin="round"><path d="m12 3 2.7 5.6 6.1.8-4.5 4.3 1.1 6.1L12 16.9l-5.4 2.9 1.1-6.1L3.2 9.4l6.1-.8L12 3Z"/></svg>
+          <svg width="22" height="22" viewBox="0 0 24 24" stroke-width="1.5" stroke-linejoin="round"><path d="m12 3 2.7 5.6 6.1.8-4.5 4.3 1.1 6.1L12 16.9l-5.4 2.9 1.1-6.1L3.2 9.4l6.1-.8L12 3Z"/></svg>
+          <svg width="22" height="22" viewBox="0 0 24 24" stroke-width="1.5" stroke-linejoin="round"><path d="m12 3 2.7 5.6 6.1.8-4.5 4.3 1.1 6.1L12 16.9l-5.4 2.9 1.1-6.1L3.2 9.4l6.1-.8L12 3Z"/></svg>
+          <svg width="22" height="22" viewBox="0 0 24 24" stroke-width="1.5" stroke-linejoin="round"><path d="m12 3 2.7 5.6 6.1.8-4.5 4.3 1.1 6.1L12 16.9l-5.4 2.9 1.1-6.1L3.2 9.4l6.1-.8L12 3Z"/></svg>
+        </div>
+        <p>App Store reviews and ratings will live here once Still ships.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- =============================== FINAL CTA ============================ -->
+  <section class="final">
+    <div class="wrap reveal">
+      <h2>Reclaim your attention. <em>Keep the Chinese.</em></h2>
+      <a class="badge" href="https://apps.apple.com/us/app/still-chinese-to-unlock/id6787534253">
+        <img src="appstore-badge.svg" alt="Download on the App Store" height="52"
+             onerror="badgeFallback(this)">
+      </a>
+      <p class="hero-note">One daily session. 10,969 words. Zero willpower required.</p>
+    </div>
+  </section>
+
+</main>
+
+<!-- ================================= FOOTER =============================== -->
+<footer class="site">
+  <div class="wrap">
+    <div class="left">
+      <span class="seal" aria-hidden="true">静</span>
+      <span class="copy">© 2026 Still.</span>
+    </div>
+    <nav class="links" aria-label="Footer">
+      <a href="https://still.fluentspace.app/">Privacy Policy</a>
+      <a href="mailto:support@fluentspace.app">support@fluentspace.app</a>
+    </nav>
+  </div>
+</footer>
+
+<script>
+  // Catch any screenshot image that failed before inline handlers attached
+  // (e.g. instant 404 from disk cache).
+  document.querySelectorAll('.shot-frame img').forEach(function (img) {
+    if (img.complete && img.naturalWidth === 0) markMissing(img);
+  });
+
+  // ---- Scroll reveal ------------------------------------------------------
+  // Fade/slide sections in as they enter the viewport. Skipped entirely when
+  // the user prefers reduced motion (CSS also forces .reveal visible).
+  if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches &&
+      'IntersectionObserver' in window) {
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) {
+        if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); }
+      });
+    }, { threshold: 0.12, rootMargin: '0px 0px -8% 0px' });
+    document.querySelectorAll('.reveal:not(.in)').forEach(function (el) { io.observe(el); });
+  } else {
+    document.querySelectorAll('.reveal').forEach(function (el) { el.classList.add('in'); });
+  }
+</script>
+
+</body>
+</html>
