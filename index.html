@@ -332,37 +332,86 @@
     color: var(--dim); font-size: 12.5px; line-height: 1.8; padding: 12px;
   }
 
-  /* ============ TikTok in-app-browser hint (JS-gated, hidden by default) == */
-  /* Shown ONLY when the UA is TikTok's webview; a real browser never sees it. */
-  .tt-hint {
-    position: fixed; top: 10px; left: 12px; right: 12px; z-index: 60;
-    display: flex; align-items: center; gap: 12px;
-    background: var(--surface-2); border: 1px solid rgba(127,168,140,.5);
-    border-radius: 14px; padding: 12px 14px;
-    box-shadow: 0 14px 40px rgba(0,0,0,.55);
-    font-size: 14px; line-height: 1.45;
+  /* ===== TikTok in-app-browser gate (JS-gated, hidden by default) ========= */
+  /* Full-screen takeover shown ONLY inside TikTok's webview. TikTok blocks
+     App Store redirects, so visitors get a 2-step instruction screen instead.
+     A real browser never matches the UA check, so this can never persist. */
+  .tt-gate {
+    position: fixed; inset: 0; z-index: 100;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: 0; padding: 40px 26px; text-align: center;
+    background:
+      radial-gradient(70% 40% at 50% -4%, rgba(127,168,140,.12), transparent 70%),
+      var(--bg);
+    overflow-y: auto;
   }
-  .tt-hint[hidden] { display: none; }
-  .tt-hint p { flex: 1; }
-  .tt-hint strong { color: var(--jade-hi); font-weight: 600; }
-  /* pulsing arrow aiming at TikTok's ⋯ button (top-right of its chrome) */
+  .tt-gate[hidden] { display: none; }
+  .tt-inner { width: 100%; max-width: 420px; display: flex; flex-direction: column; align-items: center; }
+
+  /* pulsing arrow aiming up at TikTok's ⋯ button in its own top bar */
   .tt-arrow {
-    position: fixed; top: 2px; right: 6px; z-index: 61;
-    font-size: 26px; color: var(--jade-hi); line-height: 1;
-    animation: tt-nudge 1.4s ease-in-out infinite;
-    pointer-events: none; text-shadow: 0 2px 8px rgba(0,0,0,.6);
+    position: fixed; top: 6px; right: 10px; z-index: 101;
+    font-size: 38px; color: var(--jade-hi); line-height: 1;
+    animation: tt-nudge 1.3s ease-in-out infinite;
+    pointer-events: none; text-shadow: 0 2px 10px rgba(0,0,0,.65);
   }
-  .tt-arrow[hidden] { display: none; }
   @keyframes tt-nudge {
     0%, 100% { transform: translate(0, 0); }
-    50%      { transform: translate(4px, -4px); }
+    50%      { transform: translate(5px, -5px); }
   }
-  .tt-close {
-    flex: none; width: 30px; height: 30px; border-radius: 8px;
-    border: 1px solid var(--border); background: var(--bg);
-    color: var(--dim); font-size: 16px; line-height: 1; cursor: pointer;
+
+  .tt-brand { display: flex; align-items: center; gap: 12px; margin-bottom: 18px; }
+  .tt-brand .seal { width: 44px; height: 44px; font-size: 26px; border-radius: 11px; }
+  .tt-brand .word { font-family: var(--serif); font-size: 30px; font-weight: 600; letter-spacing: .04em; }
+
+  .tt-slogan {
+    font-family: var(--serif); font-size: 19px; line-height: 1.45;
+    color: var(--dim); max-width: 30ch; margin-bottom: 34px;
   }
-  .tt-close:hover { color: var(--text); border-color: var(--jade); }
+  .tt-slogan em { font-style: normal; color: var(--jade); }
+
+  .tt-steps-title {
+    font-size: 13px; font-weight: 700; letter-spacing: .2em; text-transform: uppercase;
+    color: var(--jade); margin-bottom: 22px;
+  }
+
+  .tt-step {
+    width: 100%; display: flex; align-items: center; gap: 16px; text-align: left;
+    background: var(--surface); border: 1px solid var(--border); border-radius: 16px;
+    padding: 18px 18px; margin-bottom: 14px;
+  }
+  .tt-num {
+    flex: none; width: 38px; height: 38px; border-radius: 50%;
+    display: grid; place-items: center;
+    font-family: var(--serif); font-size: 16px; font-weight: 700; color: var(--jade);
+    border: 1px solid rgba(127,168,140,.4); background: var(--jade-soft);
+  }
+  .tt-step p { font-size: 16px; line-height: 1.5; }
+  .tt-step p strong { color: var(--jade-hi); font-weight: 600; }
+
+  /* mock of TikTok's ⋯ button, so users recognize the target */
+  .tt-dots {
+    display: inline-block; vertical-align: middle;
+    border: 1px solid var(--border); border-radius: 8px;
+    background: var(--surface-2); color: var(--text);
+    font-weight: 700; letter-spacing: 1px; line-height: 1;
+    padding: 5px 9px 7px; margin: 0 2px;
+  }
+  /* mock of TikTok's "Open in browser" sheet row (white, compass icon) */
+  .tt-sheetrow {
+    display: inline-flex; align-items: center; gap: 9px; vertical-align: middle;
+    background: #fff; color: #111; border-radius: 10px;
+    font-size: 15px; font-weight: 600; padding: 9px 14px; margin: 4px 2px 0;
+    box-shadow: 0 2px 10px rgba(0,0,0,.35);
+  }
+
+  .tt-note { margin-top: 16px; font-size: 14px; color: var(--dim); }
+  .tt-continue {
+    margin-top: 26px; font-size: 13.5px; color: var(--dim);
+    text-decoration: underline; text-underline-offset: 3px;
+    background: none; border: none; cursor: pointer; padding: 6px;
+  }
+  .tt-continue:hover { color: var(--text); }
 
   /* ============================== final CTA =============================== */
   .final { text-align: center; padding: 110px 0; position: relative; overflow: hidden; }
@@ -427,16 +476,44 @@
 
 <a class="skip" href="#main">Skip to content</a>
 
-<!-- TikTok in-app-browser hint. `hidden` by default; the script at the bottom
+<!-- TikTok in-app-browser gate. `hidden` by default; the script at the bottom
      un-hides it only when the UA matches TikTok's webview. In a real browser
-     (Safari/Chrome) it can never appear, so it won't persist after the user
-     taps "Open in Browser". -->
-<div class="tt-hint" id="ttHint" role="dialog" aria-label="How to download from TikTok" hidden>
-  <p>To download the app: tap the <strong>⋯</strong> button (top right),
-     then tap <strong>“Open in Browser”</strong>.</p>
-  <button class="tt-close" id="ttClose" aria-label="Dismiss this message">✕</button>
+     (Safari/Chrome) it can never appear, so once the user taps "Open in
+     browser" they simply get the normal page. -->
+<div class="tt-gate" id="ttGate" role="dialog" aria-modal="true" aria-label="How to download Still from TikTok" hidden>
+  <div class="tt-arrow" aria-hidden="true">↗</div>
+  <div class="tt-inner">
+    <div class="tt-brand">
+      <span class="seal" aria-hidden="true">静</span>
+      <span class="word">Still</span>
+    </div>
+    <p class="tt-slogan">Your phone stays locked until you've learned
+      <em>today's Chinese.</em></p>
+
+    <p class="tt-steps-title">Download in 2 simple steps</p>
+
+    <div class="tt-step">
+      <span class="tt-num" aria-hidden="true">1</span>
+      <p>Tap the <span class="tt-dots" aria-hidden="true">···</span> <strong>in the
+        top right corner</strong> of this screen.</p>
+    </div>
+    <div class="tt-step">
+      <span class="tt-num" aria-hidden="true">2</span>
+      <p>Then tap
+        <span class="tt-sheetrow">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#111" stroke-width="1.7" aria-hidden="true">
+            <circle cx="12" cy="12" r="9"/>
+            <path d="m15.5 8.5-2.2 4.8-4.8 2.2 2.2-4.8 4.8-2.2Z" fill="#111" stroke="none"/>
+          </svg>
+          Open in browser
+        </span>
+      </p>
+    </div>
+
+    <p class="tt-note">The App Store will open from there.</p>
+    <button class="tt-continue" id="ttContinue">Continue to the site instead</button>
+  </div>
 </div>
-<div class="tt-arrow" id="ttArrow" aria-hidden="true" hidden>↗</div>
 
 <!-- ambient rain + mist (decorative) -->
 <div class="atmos" aria-hidden="true">
@@ -624,21 +701,23 @@
 </footer>
 
 <script>
-  // ---- TikTok in-app-browser hint ------------------------------------------
-  // TikTok's webview blocks App Store redirects. Its UA always carries
-  // "BytedanceWebview" / "musical_ly" (older) / "TikTok". Real browsers
-  // never match, so the hint can only appear inside TikTok itself.
+  // ---- TikTok in-app-browser gate ------------------------------------------
+  // TikTok's webview blocks App Store redirects, so TikTok visitors get a
+  // full-screen 2-step instruction screen instead of the landing page.
+  // Its UA always carries "BytedanceWebview" / "musical_ly" (older) /
+  // "TikTok". Real browsers never match, so the gate can only appear inside
+  // TikTok itself — after "Open in browser" the normal page shows.
   (function () {
     var isTikTok = /bytedancewebview|musical_ly|tiktok/i.test(navigator.userAgent || '');
     if (!isTikTok) return;
-    var hint = document.getElementById('ttHint');
-    var arrow = document.getElementById('ttArrow');
-    if (hint) hint.hidden = false;
-    if (arrow) arrow.hidden = false;
-    var close = document.getElementById('ttClose');
-    if (close) close.addEventListener('click', function () {
-      if (hint) hint.hidden = true;
-      if (arrow) arrow.hidden = true;
+    var gate = document.getElementById('ttGate');
+    if (!gate) return;
+    if (window.sessionStorage && sessionStorage.getItem('ttGateDismissed')) return;
+    gate.hidden = false;
+    var cont = document.getElementById('ttContinue');
+    if (cont) cont.addEventListener('click', function () {
+      gate.hidden = true;
+      try { sessionStorage.setItem('ttGateDismissed', '1'); } catch (e) {}
     });
   })();
 
