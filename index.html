@@ -8,8 +8,6 @@
   Still — landing page (single self-contained file)
   Theme: "ink & rain" — the dark, greenish look of the app itself.
   Live at https://get.fluentspace.app → App Store (id6787534253).
-  The only remaining ◆ PLACEHOLDER is the social-proof section,
-  awaiting real App Store reviews.
   ============================================================ -->
 
 <title>Still — Your phone stays locked until you've learned today's Chinese</title>
@@ -334,14 +332,37 @@
     color: var(--dim); font-size: 12.5px; line-height: 1.8; padding: 12px;
   }
 
-  /* ============================= social proof ============================= */
-  .proof-inner {
-    border: 1px dashed var(--border); border-radius: 20px;
-    padding: 56px 32px; text-align: center; background: rgba(22,26,29,.5);
+  /* ============ TikTok in-app-browser hint (JS-gated, hidden by default) == */
+  /* Shown ONLY when the UA is TikTok's webview; a real browser never sees it. */
+  .tt-hint {
+    position: fixed; top: 10px; left: 12px; right: 12px; z-index: 60;
+    display: flex; align-items: center; gap: 12px;
+    background: var(--surface-2); border: 1px solid rgba(127,168,140,.5);
+    border-radius: 14px; padding: 12px 14px;
+    box-shadow: 0 14px 40px rgba(0,0,0,.55);
+    font-size: 14px; line-height: 1.45;
   }
-  .stars { display: inline-flex; gap: 6px; margin-bottom: 16px; }
-  .stars svg { stroke: var(--jade); fill: none; }
-  .proof-inner p { color: var(--dim); font-size: 15.5px; max-width: 46ch; margin: 0 auto; }
+  .tt-hint[hidden] { display: none; }
+  .tt-hint p { flex: 1; }
+  .tt-hint strong { color: var(--jade-hi); font-weight: 600; }
+  /* pulsing arrow aiming at TikTok's ⋯ button (top-right of its chrome) */
+  .tt-arrow {
+    position: fixed; top: 2px; right: 6px; z-index: 61;
+    font-size: 26px; color: var(--jade-hi); line-height: 1;
+    animation: tt-nudge 1.4s ease-in-out infinite;
+    pointer-events: none; text-shadow: 0 2px 8px rgba(0,0,0,.6);
+  }
+  .tt-arrow[hidden] { display: none; }
+  @keyframes tt-nudge {
+    0%, 100% { transform: translate(0, 0); }
+    50%      { transform: translate(4px, -4px); }
+  }
+  .tt-close {
+    flex: none; width: 30px; height: 30px; border-radius: 8px;
+    border: 1px solid var(--border); background: var(--bg);
+    color: var(--dim); font-size: 16px; line-height: 1; cursor: pointer;
+  }
+  .tt-close:hover { color: var(--text); border-color: var(--jade); }
 
   /* ============================== final CTA =============================== */
   .final { text-align: center; padding: 110px 0; position: relative; overflow: hidden; }
@@ -394,6 +415,7 @@
   @media (prefers-reduced-motion: reduce) {
     html { scroll-behavior: auto; }
     .rain-layer { animation: none; display: none; }
+    .tt-arrow { animation: none; }
     .reveal { opacity: 1; transform: none; transition: none; }
     .card, .card:hover { transform: none; transition: none; }
     .phone { transform: none; }
@@ -404,6 +426,17 @@
 <body>
 
 <a class="skip" href="#main">Skip to content</a>
+
+<!-- TikTok in-app-browser hint. `hidden` by default; the script at the bottom
+     un-hides it only when the UA matches TikTok's webview. In a real browser
+     (Safari/Chrome) it can never appear, so it won't persist after the user
+     taps "Open in Browser". -->
+<div class="tt-hint" id="ttHint" role="dialog" aria-label="How to download from TikTok" hidden>
+  <p>To download the app: tap the <strong>⋯</strong> button (top right),
+     then tap <strong>“Open in Browser”</strong>.</p>
+  <button class="tt-close" id="ttClose" aria-label="Dismiss this message">✕</button>
+</div>
+<div class="tt-arrow" id="ttArrow" aria-hidden="true" hidden>↗</div>
 
 <!-- ambient rain + mist (decorative) -->
 <div class="atmos" aria-hidden="true">
@@ -562,24 +595,6 @@
     </div>
   </section>
 
-  <!-- ============================== SOCIAL PROOF ========================== -->
-  <section class="block" id="reviews">
-    <div class="wrap">
-      <!-- ◆ PLACEHOLDER: social proof — replace this block with REAL App Store
-           reviews / ratings once they exist. Do not invent testimonials. -->
-      <div class="proof-inner reveal">
-        <div class="stars" aria-hidden="true">
-          <svg width="22" height="22" viewBox="0 0 24 24" stroke-width="1.5" stroke-linejoin="round"><path d="m12 3 2.7 5.6 6.1.8-4.5 4.3 1.1 6.1L12 16.9l-5.4 2.9 1.1-6.1L3.2 9.4l6.1-.8L12 3Z"/></svg>
-          <svg width="22" height="22" viewBox="0 0 24 24" stroke-width="1.5" stroke-linejoin="round"><path d="m12 3 2.7 5.6 6.1.8-4.5 4.3 1.1 6.1L12 16.9l-5.4 2.9 1.1-6.1L3.2 9.4l6.1-.8L12 3Z"/></svg>
-          <svg width="22" height="22" viewBox="0 0 24 24" stroke-width="1.5" stroke-linejoin="round"><path d="m12 3 2.7 5.6 6.1.8-4.5 4.3 1.1 6.1L12 16.9l-5.4 2.9 1.1-6.1L3.2 9.4l6.1-.8L12 3Z"/></svg>
-          <svg width="22" height="22" viewBox="0 0 24 24" stroke-width="1.5" stroke-linejoin="round"><path d="m12 3 2.7 5.6 6.1.8-4.5 4.3 1.1 6.1L12 16.9l-5.4 2.9 1.1-6.1L3.2 9.4l6.1-.8L12 3Z"/></svg>
-          <svg width="22" height="22" viewBox="0 0 24 24" stroke-width="1.5" stroke-linejoin="round"><path d="m12 3 2.7 5.6 6.1.8-4.5 4.3 1.1 6.1L12 16.9l-5.4 2.9 1.1-6.1L3.2 9.4l6.1-.8L12 3Z"/></svg>
-        </div>
-        <p>App Store reviews and ratings will live here once Still ships.</p>
-      </div>
-    </div>
-  </section>
-
   <!-- =============================== FINAL CTA ============================ -->
   <section class="final">
     <div class="wrap reveal">
@@ -609,6 +624,24 @@
 </footer>
 
 <script>
+  // ---- TikTok in-app-browser hint ------------------------------------------
+  // TikTok's webview blocks App Store redirects. Its UA always carries
+  // "BytedanceWebview" / "musical_ly" (older) / "TikTok". Real browsers
+  // never match, so the hint can only appear inside TikTok itself.
+  (function () {
+    var isTikTok = /bytedancewebview|musical_ly|tiktok/i.test(navigator.userAgent || '');
+    if (!isTikTok) return;
+    var hint = document.getElementById('ttHint');
+    var arrow = document.getElementById('ttArrow');
+    if (hint) hint.hidden = false;
+    if (arrow) arrow.hidden = false;
+    var close = document.getElementById('ttClose');
+    if (close) close.addEventListener('click', function () {
+      if (hint) hint.hidden = true;
+      if (arrow) arrow.hidden = true;
+    });
+  })();
+
   // Catch any screenshot image that failed before inline handlers attached
   // (e.g. instant 404 from disk cache).
   document.querySelectorAll('.shot-frame img').forEach(function (img) {
